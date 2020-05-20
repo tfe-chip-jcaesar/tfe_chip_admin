@@ -55,23 +55,37 @@ module "eu_vpc" {
   }
 }
 
-# # -----------------------------------------------------------------------------
-# # VPC Peering between Admin VPCs
-# # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# VPC Peering between Admin VPCs
+# -----------------------------------------------------------------------------
 
-# resource "aws_vpc_peering_connection" "us-eu" {
-#   provider      = aws.us-west-1
-#   vpc_id        = module.us_vpc.vpc_id
-#   peer_vpc_id   = module.eu_vpc.vpc_id
-#   peer_region   = "eu-central-1"
-#   auto_accept   = false
-# }
+resource "aws_vpc_peering_connection" "us-eu" {
+  provider    = aws.us-west-1
+  vpc_id      = module.us_vpc.vpc_id
+  peer_vpc_id = module.eu_vpc.vpc_id
+  peer_region = "eu-central-1"
+  auto_accept = false
+}
 
-# # Accepter's side of the connection.
-# resource "aws_vpc_peering_connection_accepter" "eu-us" {
-#   provider                  = aws.eu-central-1
-#   vpc_peering_connection_id = aws_vpc_peering_connection.us-eu.id
-#   auto_accept               = true
-# }
+# Accepter's side of the connection.
+resource "aws_vpc_peering_connection_accepter" "eu-us" {
+  provider                  = aws.eu-central-1
+  vpc_peering_connection_id = aws_vpc_peering_connection.us-eu.id
+  auto_accept               = true
+}
 
+resource "aws_route" "us-eu" {
+  for_each = module.us_vpc.route_tables
 
+  route_table_id            = each.value
+  destination_cidr_block    = module.eu_vpc.cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.us-eu.id
+}
+
+resource "aws_route" "eu-us" {
+  for_each = module.eu_vpc.route_tables
+
+  route_table_id            = each.value
+  destination_cidr_block    = module.us_vpc.cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.us-eu.id
+}
