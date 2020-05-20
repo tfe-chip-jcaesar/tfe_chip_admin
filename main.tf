@@ -17,4 +17,32 @@ locals {
   us_azs         = slice(local.us_az_suffixes, 0, var.num_azs > length(local.us_az_suffixes) ? length(local.us_az_suffixes) : var.num_azs)
   eu_az_suffixes = [for az in data.aws_availability_zones.eu_azs.names : trimprefix(az, "eu-central-1")]
   eu_azs         = slice(local.eu_az_suffixes, 0, var.num_azs > length(local.eu_az_suffixes) ? length(local.eu_az_suffixes) : var.num_azs)
+
+  common_tags = { "Owner" = "Jamie Caesar", "Company" = "Spacely Sprockets" }
+}
+
+# -----------------------------------------------------------------------------
+# US West 1 Admin VPC
+# -----------------------------------------------------------------------------
+
+module "us_vpc" {
+  source  = "tfe.aws.shadowmonkey.com/spacelysprockets/ss_vpc/aws"
+  version = "0.0.1"
+
+  cidr_block = "10.1.0.0/16"
+  vpc_name   = "us_admin"
+  tags       = local.common_tags
+}
+
+# -----------------------------------------------------------------------------
+# EU Central 1 Admin VPC
+# -----------------------------------------------------------------------------
+
+module "eu_vpc" {
+  source  = "tfe.aws.shadowmonkey.com/spacelysprockets/ss_vpc/aws"
+  version = "0.0.1"
+
+  cidr_block = "10.2.0.0/16"
+  vpc_name   = "eu_admin"
+  tags       = local.common_tags
 }
