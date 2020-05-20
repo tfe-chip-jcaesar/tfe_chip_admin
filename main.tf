@@ -130,7 +130,7 @@ resource "aws_security_group" "bastionHost" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge({ Name = "sg_BastionHost" }, var.common_tags)
+  tags = merge({ Name = "sg_BastionHost" }, local.common_tags)
 }
 
 resource "aws_instance" "bastion" {
@@ -141,5 +141,5 @@ resource "aws_instance" "bastion" {
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.bastionHost.id]
 
-  tags = merge({ Name = "us_bastion" }, var.common_tags)
+  tags = merge({ Name = "us_bastion" }, local.common_tags)
 }
