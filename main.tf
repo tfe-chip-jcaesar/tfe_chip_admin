@@ -151,13 +151,29 @@ resource "aws_instance" "bastion" {
 # -----------------------------------------------------------------------------
 # EU Bastion Host
 # -----------------------------------------------------------------------------
+resource "aws_key_pair" "jamie-eu" {
+  provider   = aws.eu-central-1
+  key_name   = "jamie-admin-eu"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKRqLi7AYYkDPqK09dtXtpXoV5tSL1iu1XA2wcYKe8TVUxi+sLY6XuOmD7E6NkSi70AtEqoANIsBQOSfYfc0yOX0Q30UAuQTW8SC3VAevtguxj6Yy18P/auokaLLgDvaYdlRNPdF74P0Tu21sn4Ak8rS4LjIqj3NcRKgn2Ng0SHHaY+opp4VWBnhBWWiNnz4A1Ul4Y1etmFp6BJVoLV51L7CK9XhYYHWx2uEUMyMP1Yz9raDRIlBxH7ulaw4rPfkVf9oLdE+BuD0VycoDv2GYf9gWSxZ31cQN5yZ5eUZyUKg8ZV1M+FQmDzsyL3P6R6QrI1ELUSMr0Qjgoz2tB9M3X"
+}
 
+module "eu_bastion" {
+  source  = "tfe.aws.shadowmonkey.com/spacelysprockets/bastion/aws"
+  version = "0.0.2"
 
-# resource "aws_key_pair" "jamie-eu" {
-#   provider   = aws.eu-central-1
-#   key_name   = "jamie-admin-eu"
-#   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKRqLi7AYYkDPqK09dtXtpXoV5tSL1iu1XA2wcYKe8TVUxi+sLY6XuOmD7E6NkSi70AtEqoANIsBQOSfYfc0yOX0Q30UAuQTW8SC3VAevtguxj6Yy18P/auokaLLgDvaYdlRNPdF74P0Tu21sn4Ak8rS4LjIqj3NcRKgn2Ng0SHHaY+opp4VWBnhBWWiNnz4A1Ul4Y1etmFp6BJVoLV51L7CK9XhYYHWx2uEUMyMP1Yz9raDRIlBxH7ulaw4rPfkVf9oLdE+BuD0VycoDv2GYf9gWSxZ31cQN5yZ5eUZyUKg8ZV1M+FQmDzsyL3P6R6QrI1ELUSMr0Qjgoz2tB9M3X"
-# }
+  ami         = "ami-076431be05aaf8080"
+  common_tags = local.common_tags
+  name        = "eu_bastion"
+  size        = "t2.small"
+  subnet_id   = module.eu_vpc.subnets.public.a.id
+  ssh_key     = aws_key_pair.jamie-eu.key_name
+  vpc_id      = module.eu_vpc.vpc_id
+
+  providers = {
+    aws = aws.eu-central-1
+  }
+}
+
 
 # resource "aws_security_group" "eubastionHost" {
 #   provider    = aws.eu-central-1
