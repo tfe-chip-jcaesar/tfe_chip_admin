@@ -157,7 +157,7 @@ resource "aws_security_group" "eubastionHost" {
   provider    = aws.eu-central-1
   name        = "bastionHost"
   description = "bastionHost"
-  vpc_id      = module.us_vpc.vpc_id
+  vpc_id      = module.eu_vpc.vpc_id
 
   ingress {
     description = "SSH"
