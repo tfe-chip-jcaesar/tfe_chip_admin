@@ -32,7 +32,6 @@ module "us_vpc" {
   cidr_block = "10.1.0.0/16"
   vpc_name   = "us_admin"
   tags       = local.common_tags
-  peers      = { "eu_vpc" = module.eu_vpc.peer_data }
 
   providers = {
     aws = aws.us-west-1
