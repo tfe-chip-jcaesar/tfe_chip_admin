@@ -148,3 +148,28 @@ module "eu_bastion" {
     aws = aws.eu-central-1
   }
 }
+
+
+# -----------------------------------------------------------------------------
+# Wordpress VPC Peerings
+# -----------------------------------------------------------------------------
+
+data "terraform_remote_state" "wordpress" {
+  backend = "remote"
+
+  config = {
+    hostname     = "tfe.aws.shadowmonkey.com"
+    organization = "spacelysprockets"
+    workspaces = {
+      name = "tfe_chip_wordpress"
+    }
+  }
+}
+
+resource "aws_vpc_peering_connection" "us-wp" {
+  provider    = aws.us-west-1
+  vpc_id      = module.us_vpc.vpc_id
+  peer_vpc_id = data.terraform_remote_state.wordpress.us_vpc_data.vpc_id
+  auto_accept = true
+}
+
