@@ -27,7 +27,7 @@ locals {
 
 module "us_vpc" {
   source  = "tfe.aws.shadowmonkey.com/spacelysprockets/ss_vpc/aws"
-  version = "0.0.2"
+  version = "0.0.3"
 
   cidr_block = "10.1.0.0/16"
   vpc_name   = "us_admin"
@@ -44,7 +44,7 @@ module "us_vpc" {
 
 module "eu_vpc" {
   source  = "tfe.aws.shadowmonkey.com/spacelysprockets/ss_vpc/aws"
-  version = "0.0.2"
+  version = "0.0.3"
 
   cidr_block = "10.2.0.0/16"
   vpc_name   = "eu_admin"
@@ -54,3 +54,24 @@ module "eu_vpc" {
     aws = aws.eu-central-1
   }
 }
+
+# -----------------------------------------------------------------------------
+# VPC Peering between Admin VPCs
+# -----------------------------------------------------------------------------
+
+# resource "aws_vpc_peering_connection" "us-eu" {
+#   provider    = aws.us-west-1
+#   vpc_id      = module.us_vpc.vpc_id
+#   peer_vpc_id = module.eu_vpc.vpc_id
+#   peer_region = "eu-central-1"
+#   auto_accept = false
+# }
+
+# # Accepter's side of the connection.
+# resource "aws_vpc_peering_connection_accepter" "eu-us" {
+#   provider                  = aws.eu-central-1
+#   vpc_peering_connection_id = aws_vpc_peering_connection.us-eu.id
+#   auto_accept               = true
+# }
+
+
