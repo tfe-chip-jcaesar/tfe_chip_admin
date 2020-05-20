@@ -1,4 +1,4 @@
-# output "us_peers" {
-#   value = module.us_vpc.peer_list
-# }
+output "ssh_key_name" {
+  value = aws_key_pair.jamie.key_name
+}
 
