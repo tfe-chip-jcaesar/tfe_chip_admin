@@ -106,7 +106,7 @@ resource "aws_key_pair" "jamie" {
 
 module "us_bastion" {
   source  = "tfe.aws.shadowmonkey.com/spacelysprockets/bastion/aws"
-  version = "0.0.2"
+  version = "0.0.3"
 
   ami         = "ami-06fcc1f0bc2c8943f"
   common_tags = local.common_tags
