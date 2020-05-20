@@ -18,7 +18,7 @@ locals {
   eu_az_suffixes = [for az in data.aws_availability_zones.eu_azs.names : trimprefix(az, "eu-central-1")]
   eu_azs         = slice(local.eu_az_suffixes, 0, var.num_azs > length(local.eu_az_suffixes) ? length(local.eu_az_suffixes) : var.num_azs)
 
-  common_tags = { "Owner" = "Jamie Caesar", "Company" = "Spacely Sprockets" }
+  common_tags = { "Owner" = "Jamie Caesar", "Company" = "Spacely Sprockets", "Application" = "Admin" }
 }
 
 

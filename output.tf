@@ -14,10 +14,18 @@ output "eu_vpc_data" {
   }
 }
 
-output "wp_pcx" {
+output "wp_us_pcx" {
   value = aws_vpc_peering_connection.us-wp.id
 }
 
-output "dr_pcx" {
+output "wp_eu_pcx" {
+  value = aws_vpc_peering_connection.eu-wp.id
+}
+
+output "dr_us_pcx" {
   value = aws_vpc_peering_connection.us-dr.id
+}
+
+output "dr_eu_pcx" {
+  value = aws_vpc_peering_connection.eu-dr.id
 }
