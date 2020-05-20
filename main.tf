@@ -198,3 +198,50 @@ resource "aws_route" "eu-wp" {
   vpc_peering_connection_id = aws_vpc_peering_connection.eu-wp.id
 }
 
+# -----------------------------------------------------------------------------
+# Drupal VPC Peerings
+# -----------------------------------------------------------------------------
+
+data "terraform_remote_state" "drupal" {
+  backend = "remote"
+
+  config = {
+    hostname     = "tfe.aws.shadowmonkey.com"
+    organization = "spacelysprockets"
+    workspaces = {
+      name = "tfe_chip_drupal"
+    }
+  }
+}
+
+resource "aws_vpc_peering_connection" "us-dr" {
+  provider    = aws.us-west-1
+  vpc_id      = module.us_vpc.vpc_id
+  peer_vpc_id = data.terraform_remote_state.drupal.outputs.us_vpc_data.vpc_id
+  auto_accept = true
+}
+
+resource "aws_route" "us-dr" {
+  provider = aws.us-west-1
+  for_each = toset(module.us_vpc.route_tables)
+
+  route_table_id            = each.value
+  destination_cidr_block    = data.terraform_remote_state.drupal.outputs.us_vpc_data.cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.us-dr.id
+}
+
+resource "aws_vpc_peering_connection" "eu-dr" {
+  provider    = aws.eu-central-1
+  vpc_id      = module.eu_vpc.vpc_id
+  peer_vpc_id = data.terraform_remote_state.drupal.outputs.eu_vpc_data.vpc_id
+  auto_accept = true
+}
+
+resource "aws_route" "eu-dr" {
+  provider = aws.eu-central-1
+  for_each = toset(module.eu_vpc.route_tables)
+
+  route_table_id            = each.value
+  destination_cidr_block    = data.terraform_remote_state.drupal.outputs.eu_vpc_data.cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.eu-dr.id
+}

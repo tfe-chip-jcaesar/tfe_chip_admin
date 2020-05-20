@@ -13,3 +13,11 @@ output "eu_vpc_data" {
     "region" = "eu-central-1"
   }
 }
+
+output "wp_pcx" {
+  value = aws_vpc_peering_connection.us-wp.id
+}
+
+output "wp_pcx" {
+  value = aws_vpc_peering_connection.us-dr.id
+}
