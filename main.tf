@@ -173,3 +173,28 @@ resource "aws_vpc_peering_connection" "us-wp" {
   auto_accept = true
 }
 
+resource "aws_route" "us-wp" {
+  provider = aws.us-west-1
+  for_each = toset(module.us_vpc.route_tables)
+
+  route_table_id            = each.value
+  destination_cidr_block    = data.terraform_remote_state.wordpress.outputs.us_vpc_data.cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.us-wp.id
+}
+
+resource "aws_vpc_peering_connection" "eu-wp" {
+  provider    = aws.eu-central-1
+  vpc_id      = module.eu_vpc.vpc_id
+  peer_vpc_id = data.terraform_remote_state.wordpress.outputs.eu_vpc_data.vpc_id
+  auto_accept = true
+}
+
+resource "aws_route" "eu-wp" {
+  provider = aws.eu-central-1
+  for_each = toset(module.eu_vpc.route_tables)
+
+  route_table_id            = each.value
+  destination_cidr_block    = data.terraform_remote_state.wordpress.outputs.eu_vpc_data.cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.eu-wp.id
+}
+
