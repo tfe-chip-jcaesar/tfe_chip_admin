@@ -27,11 +27,12 @@ locals {
 
 module "us_vpc" {
   source  = "tfe.aws.shadowmonkey.com/spacelysprockets/ss_vpc/aws"
-  version = "0.0.2"
+  version = "0.1.1"
 
   cidr_block = "10.1.0.0/16"
   vpc_name   = "us_admin"
   tags       = local.common_tags
+  peers      = { "eu_vpc" = module.eu_vpc.peer_data }
 
   providers = {
     aws = aws.us-west-1
@@ -44,7 +45,7 @@ module "us_vpc" {
 
 module "eu_vpc" {
   source  = "tfe.aws.shadowmonkey.com/spacelysprockets/ss_vpc/aws"
-  version = "0.0.2"
+  version = "0.1.1"
 
   cidr_block = "10.2.0.0/16"
   vpc_name   = "eu_admin"

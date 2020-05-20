@@ -1,7 +1,4 @@
-output "us_azs" {
-  value = local.us_azs
+output "us_peers" {
+  value = module.us_vpc.peer_list
 }
 
-output "eu_azs" {
-  value = local.eu_azs
-}
