@@ -33,6 +33,7 @@ module "us_vpc" {
   cidr_block = "10.1.0.0/16"
   vpc_name   = "us_admin"
   tags       = local.common_tags
+  azs        = local.us_azs
 
   providers = {
     aws = aws.us-west-1
@@ -50,6 +51,7 @@ module "eu_vpc" {
   cidr_block = "10.2.0.0/16"
   vpc_name   = "eu_admin"
   tags       = local.common_tags
+  azs        = local.eu_azs
 
   providers = {
     aws = aws.eu-central-1
