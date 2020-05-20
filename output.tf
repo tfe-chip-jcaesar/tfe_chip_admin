@@ -18,6 +18,6 @@ output "wp_pcx" {
   value = aws_vpc_peering_connection.us-wp.id
 }
 
-output "wp_pcx" {
+output "dr_pcx" {
   value = aws_vpc_peering_connection.us-dr.id
 }
