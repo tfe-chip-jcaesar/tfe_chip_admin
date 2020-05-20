@@ -75,7 +75,8 @@ resource "aws_vpc_peering_connection_accepter" "eu-us" {
 }
 
 resource "aws_route" "us-eu" {
-  for_each = module.us_vpc.route_tables
+  provider = aws.us-west-1
+  for_each = toset(module.us_vpc.route_tables)
 
   route_table_id            = each.value
   destination_cidr_block    = module.eu_vpc.cidr
@@ -83,7 +84,8 @@ resource "aws_route" "us-eu" {
 }
 
 resource "aws_route" "eu-us" {
-  for_each = module.eu_vpc.route_tables
+  provider = aws.eu-central-1
+  for_each = toset(module.eu_vpc.route_tables)
 
   route_table_id            = each.value
   destination_cidr_block    = module.us_vpc.cidr
