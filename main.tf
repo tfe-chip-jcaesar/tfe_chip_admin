@@ -102,7 +102,7 @@ resource "aws_route" "eu-us" {
 }
 
 # -----------------------------------------------------------------------------
-# Bastion Host
+# US Bastion Host
 # -----------------------------------------------------------------------------
 
 resource "aws_security_group" "bastionHost" {
@@ -138,6 +138,7 @@ resource "aws_security_group" "bastionHost" {
 }
 
 resource "aws_instance" "bastion" {
+  provider                    = aws.us-west-1
   ami                         = "ami-06fcc1f0bc2c8943f"
   instance_type               = "t2.small"
   key_name                    = aws_key_pair.jamie.key_name
@@ -146,4 +147,52 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids      = [aws_security_group.bastionHost.id]
 
   tags = merge({ Name = "us_bastion" }, local.common_tags)
+}
+
+# -----------------------------------------------------------------------------
+# EU Bastion Host
+# -----------------------------------------------------------------------------
+
+resource "aws_security_group" "eubastionHost" {
+  provider    = aws.eu-central-1
+  name        = "bastionHost"
+  description = "bastionHost"
+  vpc_id      = module.us_vpc.vpc_id
+
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Private Inbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge({ Name = "sg_BastionHost" }, local.common_tags)
+}
+
+resource "aws_instance" "eubastion" {
+  provider                    = aws.eu-central-1
+  ami                         = "ami-076431be05aaf8080"
+  instance_type               = "t2.small"
+  key_name                    = aws_key_pair.jamie.key_name
+  subnet_id                   = module.eu_vpc.subnets.public.a.id
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.eubastionHost.id]
+
+  tags = merge({ Name = "eu_bastion" }, local.common_tags)
 }
