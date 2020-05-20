@@ -13,8 +13,8 @@ data "aws_availability_zones" "eu_azs" {
 }
 
 locals {
-  us_az_suffixes = [for az in data.aws_availability_zones.us_azs.names : az[-1]]
+  us_az_suffixes = [for az in data.aws_availability_zones.us_azs.names : trimprefix(az, "us-west-1")]
   us_azs         = slice(local.us_az_suffixes, 0, var.num_azs > length(local.us_az_suffixes) ? length(local.us_az_suffixes) : var.num_azs)
-  eu_az_suffixes = [for az in data.aws_availability_zones.eu_azs.names : az[-1]]
+  eu_az_suffixes = [for az in data.aws_availability_zones.eu_azs.names : trimprefix(az, "eu-central-1")]
   eu_azs         = slice(local.eu_az_suffixes, 0, var.num_azs > length(local.eu_az_suffixes) ? length(local.eu_az_suffixes) : var.num_azs)
 }
