@@ -104,48 +104,21 @@ resource "aws_key_pair" "jamie" {
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKRqLi7AYYkDPqK09dtXtpXoV5tSL1iu1XA2wcYKe8TVUxi+sLY6XuOmD7E6NkSi70AtEqoANIsBQOSfYfc0yOX0Q30UAuQTW8SC3VAevtguxj6Yy18P/auokaLLgDvaYdlRNPdF74P0Tu21sn4Ak8rS4LjIqj3NcRKgn2Ng0SHHaY+opp4VWBnhBWWiNnz4A1Ul4Y1etmFp6BJVoLV51L7CK9XhYYHWx2uEUMyMP1Yz9raDRIlBxH7ulaw4rPfkVf9oLdE+BuD0VycoDv2GYf9gWSxZ31cQN5yZ5eUZyUKg8ZV1M+FQmDzsyL3P6R6QrI1ELUSMr0Qjgoz2tB9M3X"
 }
 
-resource "aws_security_group" "bastionHost" {
-  provider    = aws.us-west-1
-  name        = "bastionHost"
-  description = "bastionHost"
+module "us_bastion" {
+  source  = "tfe.aws.shadowmonkey.com/spacelysprockets/bastion/aws"
+  version = "0.0.2"
+
+  ami         = "ami-06fcc1f0bc2c8943f"
+  common_tags = local.common_tags
+  name        = "us_bastion"
+  size        = "t2.small"
+  subnet_id   = module.us_vpc.subnets.public.a.id
+  ssh_key     = aws_key_pair.jamie.key_name
   vpc_id      = module.us_vpc.vpc_id
 
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  providers = {
+    aws = aws.us-west-1
   }
-
-  ingress {
-    description = "Private Inbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = merge({ Name = "sg_BastionHost" }, local.common_tags)
-}
-
-resource "aws_instance" "bastion" {
-  provider                    = aws.us-west-1
-  ami                         = "ami-06fcc1f0bc2c8943f"
-  instance_type               = "t2.small"
-  key_name                    = aws_key_pair.jamie.key_name
-  subnet_id                   = module.us_vpc.subnets.public.a.id
-  associate_public_ip_address = true
-  vpc_security_group_ids      = [aws_security_group.bastionHost.id]
-
-  tags = merge({ Name = "us_bastion" }, local.common_tags)
 }
 
 # -----------------------------------------------------------------------------
@@ -173,48 +146,3 @@ module "eu_bastion" {
     aws = aws.eu-central-1
   }
 }
-
-
-# resource "aws_security_group" "eubastionHost" {
-#   provider    = aws.eu-central-1
-#   name        = "bastionHost"
-#   description = "bastionHost"
-#   vpc_id      = module.eu_vpc.vpc_id
-
-#   ingress {
-#     description = "SSH"
-#     from_port   = 22
-#     to_port     = 22
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   ingress {
-#     description = "Private Inbound"
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
-#   }
-
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   tags = merge({ Name = "sg_BastionHost" }, local.common_tags)
-# }
-
-# resource "aws_instance" "eubastion" {
-#   provider                    = aws.eu-central-1
-#   ami                         = "ami-076431be05aaf8080"
-#   instance_type               = "t2.small"
-#   key_name                    = aws_key_pair.jamie-eu.key_name
-#   subnet_id                   = module.eu_vpc.subnets.public.a.id
-#   associate_public_ip_address = true
-#   vpc_security_group_ids      = [aws_security_group.eubastionHost.id]
-
-#   tags = merge({ Name = "eu_bastion" }, local.common_tags)
-# }
