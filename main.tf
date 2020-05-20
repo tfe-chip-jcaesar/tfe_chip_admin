@@ -136,7 +136,7 @@ resource "aws_security_group" "bastionHost" {
 resource "aws_instance" "bastion" {
   ami                         = "ami-06fcc1f0bc2c8943f"
   instance_type               = "t2.small"
-  key_name                    = aws_key_pair.jamie.name
+  key_name                    = aws_key_pair.jamie.key_name
   subnet_id                   = module.us_vpc.subnet.public.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.bastionHost.id]
